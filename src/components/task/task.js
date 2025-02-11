@@ -34,6 +34,8 @@ class Task extends Component {
       timerDate,
       createDate,
       currentDate,
+      onStop,
+      onPlay,
     } = this.props
 
     const imp = edit ? <EditionImput todos={todos} editItem={editItem} /> : null
@@ -46,6 +48,8 @@ class Task extends Component {
         createDate={createDate}
         timerDate={timerDate}
         currentDate={currentDate}
+        onStop={onStop}
+        onPlay={onPlay}
       />
     ) : null
 

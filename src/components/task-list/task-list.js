@@ -4,12 +4,12 @@ import { formatDistanceToNow } from 'date-fns'
 import Task from '../task'
 
 function TaskList(props) {
-  const { todos, onDelete, onToggleComplited, editItem, edition, onChecked, currentDate } = props
+  const { todos, onDelete, onToggleComplited, editItem, edition, onChecked, currentDate, onStop, onPlay } = props
 
   const elements = todos.map((item) => (
     <Task
-      min={item.min}
-      sec={item.sec}
+      min={item.newMinut}
+      sec={item.newSec}
       timerDate={item.timerDate}
       todos={todos}
       edit={item.edit}
@@ -32,6 +32,12 @@ function TaskList(props) {
       }}
       onChecked={() => {
         onChecked(item.id)
+      }}
+      onPlay={() => {
+        onPlay(item.id)
+      }}
+      onStop={() => {
+        onStop(item.id)
       }}
     />
   ))
