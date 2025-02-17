@@ -34,47 +34,6 @@ class App extends Component {
     clearInterval(this.timerID)
   }
 
-  onPlay = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-      newItem.onPlay = true
-      newItem.onStop = false
-
-      if (newItem.timeOnStop === 0) {
-        newItem.firstOnPlay = new Date().valueOf() + newItem.delta
-      }
-      newItem.timeOnPlay = newItem.timeOnStop === 0 ? 0 : new Date().valueOf()
-      if (newItem.timeOnPlay !== 0) {
-        newItem.totalTime += newItem.timeOnPlay - newItem.timeOnStop
-      }
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  onStop = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-      newItem.onStop = true
-      newItem.onPlay = false
-      newItem.timeOnStop = new Date().valueOf()
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
   onDelete = (id) => {
     this.setState(({ todoData }) => {
       const ind = todoData.findIndex((el) => el.id === id)
@@ -232,6 +191,47 @@ class App extends Component {
     })
   }
 
+  onPlay = (id) => {
+    this.setState(({ todoData }) => {
+      const ind = todoData.findIndex((el) => el.id === id)
+      const oldItem = todoData[ind]
+      const newItem = JSON.parse(JSON.stringify(oldItem))
+
+      if (newItem.timeOnStop !== 0 && !newItem.onPlay) {
+        newItem.totalTime += newItem.timeOnStop - newItem.timeOnPlay
+      }
+      newItem.timeOnPlay = !newItem.onPlay ? new Date().valueOf() : newItem.timeOnPlay
+
+      newItem.onPlay = true
+      newItem.onStop = false
+
+      const newArray = todoData.toSpliced(ind, 1, newItem)
+
+      return {
+        todoData: newArray,
+      }
+    })
+  }
+
+  onStop = (id) => {
+    this.setState(({ todoData }) => {
+      const ind = todoData.findIndex((el) => el.id === id)
+      const oldItem = todoData[ind]
+      const newItem = JSON.parse(JSON.stringify(oldItem))
+
+      newItem.timeOnStop = !newItem.onStop ? new Date().valueOf() : newItem.timeOnStop
+
+      newItem.onStop = true
+      newItem.onPlay = false
+
+      const newArray = todoData.toSpliced(ind, 1, newItem)
+
+      return {
+        todoData: newArray,
+      }
+    })
+  }
+
   tick() {
     this.setState({ currentDate: new Date() })
   }
@@ -245,25 +245,19 @@ class App extends Component {
 
         let diff
 
-        if (item.min === '0' && item.sec === '0' && item.onPlay && item.firstOnPlay !== 0) {
-          diff = currentDate - item.firstOnPlay - item.totalTime
-        } else {
-          if (item.onPlay && item.firstOnPlay !== 0) {
-            diff = item.firstOnPlay - currentDate + item.totalTime
-          }
-          if (item.onStop && item.timeOnStop !== 0) {
-            diff = item.firstOnPlay - item.timeOnStop + item.totalTime
-          }
+        if (item.onPlay) {
+          diff = item.timeOnPlay + item.delta - currentDate - item.totalTime
         }
-        if (diff > 0) {
-          let minuta = Math.floor(diff / 1000 / 60) % 60
-          let secunda = Math.floor(diff / 1000) % 60
-          minuta = minuta < 0 ? 0 : minuta
-          secunda = secunda < 0 ? secunda * -1 : secunda
+        if (item.onStop) {
+          diff = item.timeOnPlay + item.delta - item.timeOnStop - item.totalTime
+        }
+        diff = diff > 0 ? diff : 0
+        const minuta = Math.floor(diff / 1000 / 60) % 60
+        const secunda = Math.floor(diff / 1000) % 60
 
-          item.newMinut = minuta < 10 ? `0${minuta}` : minuta
-          item.newSec = secunda < 10 ? `0${secunda}` : secunda
-        }
+        item.newMinut = minuta < 10 ? `0${minuta}` : minuta
+        item.newSec = secunda < 10 ? `0${secunda}` : secunda
+
         return item
       })
 
@@ -295,7 +289,6 @@ class App extends Component {
       timeOnPlay: 0,
       timeOnStop: 0,
       totalTime: 0,
-      firstOnPlay: 0,
       newMinut: Number(min),
       newSec: Number(sec),
       finish: false,
@@ -325,19 +318,19 @@ class App extends Component {
             onStop={this.onStop}
             onPlay={this.onPlay}
           />
-        </section>
 
-        <Footer
-          todoComplited={todoComplited}
-          activ={activ}
-          filter={this.filter}
-          allchosen={this.allchosen}
-          todos={todoData}
-          complit={this.complit}
-          activchosen={this.activchosen}
-          deletComplited={this.deletComplited}
-          onAllDell={this.onAllDell}
-        />
+          <Footer
+            todoComplited={todoComplited}
+            activ={activ}
+            filter={this.filter}
+            allchosen={this.allchosen}
+            todos={todoData}
+            complit={this.complit}
+            activchosen={this.activchosen}
+            deletComplited={this.deletComplited}
+            onAllDell={this.onAllDell}
+          />
+        </section>
       </section>
     )
   }

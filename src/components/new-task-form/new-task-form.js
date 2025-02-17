@@ -6,8 +6,8 @@ class NewTaskForm extends Component {
   state = {
     label: '',
 
-    initialMin: '0',
-    initialSec: '0',
+    initialMin: '',
+    initialSec: '',
   }
 
   onEnter = (e) => {
@@ -21,8 +21,8 @@ class NewTaskForm extends Component {
 
       this.setState({
         label: '',
-        initialMin: '0',
-        initialSec: '0',
+        initialMin: '',
+        initialSec: '',
       })
     }
   }
@@ -52,30 +52,32 @@ class NewTaskForm extends Component {
     return (
       <header className="header">
         <AppHeader />
-        <input
-          placeholder="What needs to be done?"
-          className="new-todo"
-          onKeyUp={this.onEnter}
-          onChange={this.onLabelCange}
-          value={label}
-          data-action="tasca"
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Min"
-          onKeyUp={this.onEnter}
-          onChange={this.onLabelCange}
-          value={initialMin}
-          data-action="min"
-        />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Sec"
-          onKeyUp={this.onEnter}
-          onChange={this.onLabelCange}
-          value={initialSec}
-          data-action="sec"
-        />
+        <form className="new-todo-form">
+          <input
+            placeholder="What needs to be done?"
+            className="new-todo"
+            onKeyUp={this.onEnter}
+            onChange={this.onLabelCange}
+            value={label}
+            data-action="tasca"
+          />
+          <input
+            className="new-todo-form__timer"
+            placeholder="Min"
+            onKeyUp={this.onEnter}
+            onChange={this.onLabelCange}
+            value={initialMin}
+            data-action="min"
+          />
+          <input
+            className="new-todo-form__timer"
+            placeholder="Sec"
+            onKeyUp={this.onEnter}
+            onChange={this.onLabelCange}
+            value={initialSec}
+            data-action="sec"
+          />
+        </form>
       </header>
     )
   }
