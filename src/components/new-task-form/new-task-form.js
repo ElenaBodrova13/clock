@@ -1,86 +1,70 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 
 import AppHeader from '../app-header'
 
-class NewTaskForm extends Component {
-  state = {
-    label: '',
+function NewTaskForm(props) {
+  const [label, setLabel] = useState('')
+  const [initialMin, setInitialMin] = useState('')
+  const [initialSec, setInitialSec] = useState('')
 
-    initialMin: '',
-    initialSec: '',
-  }
+  function onEnter(e) {
+    const { addItem } = props
 
-  onEnter = (e) => {
-    const { addItem } = this.props
-    const { label, initialMin, initialSec } = this.state
     if (!label) {
       return
     }
     if (e.key === 'Enter') {
       addItem(label, initialMin, initialSec)
-
-      this.setState({
-        label: '',
-        initialMin: '',
-        initialSec: '',
-      })
+      setLabel('')
+      setInitialMin('')
+      setInitialSec('')
     }
   }
 
-  onLabelCange = (e) => {
+  function onLabelCange(e) {
     if (e.target.dataset.action === 'tasca') {
-      this.setState({
-        label: e.target.value,
-        // eslint-disable-next-line react/no-unused-state
-      })
+      setLabel(e.target.value)
     }
     if (e.target.dataset.action === 'min') {
-      this.setState({
-        initialMin: e.target.value,
-      })
+      setInitialMin(e.target.value)
     }
 
     if (e.target.dataset.action === 'sec') {
-      this.setState({
-        initialSec: e.target.value,
-      })
+      setInitialSec(e.target.value)
     }
   }
 
-  render() {
-    const { label, initialMin, initialSec } = this.state
-    return (
-      <header className="header">
-        <AppHeader />
-        <form className="new-todo-form">
-          <input
-            placeholder="What needs to be done?"
-            className="new-todo"
-            onKeyUp={this.onEnter}
-            onChange={this.onLabelCange}
-            value={label}
-            data-action="tasca"
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Min"
-            onKeyUp={this.onEnter}
-            onChange={this.onLabelCange}
-            value={initialMin}
-            data-action="min"
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Sec"
-            onKeyUp={this.onEnter}
-            onChange={this.onLabelCange}
-            value={initialSec}
-            data-action="sec"
-          />
-        </form>
-      </header>
-    )
-  }
+  return (
+    <header className="header">
+      <AppHeader />
+      <form className="new-todo-form">
+        <input
+          placeholder="What needs to be done?"
+          className="new-todo"
+          onKeyUp={onEnter}
+          onChange={onLabelCange}
+          value={label}
+          data-action="tasca"
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          onKeyUp={onEnter}
+          onChange={onLabelCange}
+          value={initialMin}
+          data-action="min"
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          onKeyUp={onEnter}
+          onChange={onLabelCange}
+          value={initialSec}
+          data-action="sec"
+        />
+      </form>
+    </header>
+  )
 }
 
 export default NewTaskForm

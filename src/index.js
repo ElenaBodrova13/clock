@@ -1,276 +1,16 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import TaskList from './components/task-list'
 import NewTaskForm from './components/new-task-form'
 import Footer from './components/footer'
 
-class App extends Component {
-  maxId = 100
-
-  state = {
-    todoData: [
-      this.createTodoItem('fw', '12', '25'),
-      this.createTodoItem('fw', '12', '25'),
-      this.createTodoItem('fw', '12', '25'),
-    ],
-    newTodo: [],
-    currentDate: new Date(),
-  }
-
-  componentDidMount() {
-    this.timerID = setInterval(() => this.tick(), 1000)
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { currentDate: newResult } = this.state
-    const { currentDate: oldResult } = prevState
-    if (newResult !== oldResult) {
-      this.calculateTime()
-    }
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID)
-  }
-
-  onDelete = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const newArr = todoData.toSpliced(ind, 1)
-      return {
-        todoData: newArr,
-      }
-    })
-  }
-
-  onChecked = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-
-      newItem.cheked = !oldItem.cheked
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  onToggleComplited = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-      newItem.complited = !oldItem.complited
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  allchosen = () => {
-    this.setState(({ todoData }) => {
-      const newItem = JSON.parse(JSON.stringify(todoData))
-
-      newItem.forEach((element) => {
-        element.filtered = 'all'
-      })
-      return { todoData: newItem }
-    })
-  }
-
-  complit = () => {
-    this.setState(({ todoData }) => {
-      const newItem = JSON.parse(JSON.stringify(todoData))
-
-      newItem.forEach((el) => {
-        el.filtered = 'complited'
-      })
-      return { todoData: newItem }
-    })
-  }
-
-  edition = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-      newItem.edit = !oldItem.edit
-      newItem.label = ''
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  activchosen = () => {
-    this.setState(({ todoData }) => {
-      const newItem = JSON.parse(JSON.stringify(todoData))
-
-      newItem.forEach((element) => {
-        element.filtered = 'activ'
-      })
-      return { todoData: newItem }
-    })
-  }
-
-  deletComplited = () => {
-    this.setState(({ todoData }) => {
-      const newTodo = JSON.parse(JSON.stringify(todoData))
-
-      const newArr = newTodo.filter((el) => !el.complited)
-      return { todoData: newArr }
-    })
-  }
-
-  filter = () => {
-    this.setState(({ todoData }) => {
-      const newTodo = JSON.parse(JSON.stringify(todoData))
-      let newArr
-      newTodo.forEach((element) => {
-        if (element.filtered === 'all') {
-          newArr = todoData
-
-          return newArr
-        }
-        if (element.filtered === 'complited') {
-          newArr = newTodo.filter((el) => el.complited)
-
-          return newArr
-        }
-        if (element.filtered === 'activ') {
-          newArr = newTodo.filter((el) => !el.complited)
-          return newArr
-        }
-        return newArr
-      })
-      return { newTodo: newArr }
-    })
-  }
-
-  chusTodo = (todoData, newTodo) => {
-    if (todoData[0].filtered === 'all') {
-      return todoData
-    }
-    return newTodo
-  }
-
-  editItem = (id, text) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-      newItem.label = text
-      newItem.edit = false
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  addItem = (text, min, sec) => {
-    const newItem = this.createTodoItem(text, min, sec)
-    this.setState(({ todoData }) => {
-      const newArr = [...todoData, newItem]
-      return {
-        todoData: newArr,
-      }
-    })
-  }
-
-  onPlay = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-
-      if (newItem.timeOnStop !== 0 && !newItem.onPlay) {
-        newItem.totalTime += newItem.timeOnStop - newItem.timeOnPlay
-      }
-      newItem.timeOnPlay = !newItem.onPlay ? new Date().valueOf() : newItem.timeOnPlay
-
-      newItem.onPlay = true
-      newItem.onStop = false
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  onStop = (id) => {
-    this.setState(({ todoData }) => {
-      const ind = todoData.findIndex((el) => el.id === id)
-      const oldItem = todoData[ind]
-      const newItem = JSON.parse(JSON.stringify(oldItem))
-
-      newItem.timeOnStop = !newItem.onStop ? new Date().valueOf() : newItem.timeOnStop
-
-      newItem.onStop = true
-      newItem.onPlay = false
-
-      const newArray = todoData.toSpliced(ind, 1, newItem)
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  tick() {
-    this.setState({ currentDate: new Date() })
-  }
-
-  calculateTime() {
-    this.setState(({ todoData, currentDate }) => {
-      const newTodo = JSON.parse(JSON.stringify(todoData))
-
-      const newArray = newTodo.map((index) => {
-        const item = { ...index }
-
-        let diff
-
-        if (item.onPlay) {
-          diff = item.timeOnPlay + item.delta - currentDate - item.totalTime
-        }
-        if (item.onStop) {
-          diff = item.timeOnPlay + item.delta - item.timeOnStop - item.totalTime
-        }
-        diff = diff > 0 ? diff : 0
-        const minuta = Math.floor(diff / 1000 / 60) % 60
-        const secunda = Math.floor(diff / 1000) % 60
-
-        item.newMinut = minuta < 10 ? `0${minuta}` : minuta
-        item.newSec = secunda < 10 ? `0${secunda}` : secunda
-
-        return item
-      })
-
-      return {
-        todoData: newArray,
-      }
-    })
-  }
-
-  createTodoItem(label, min, sec) {
-    let taskId = this.maxId
+function App() {
+  let maxId = 100
+  const createTodoItem = (label, min, sec) => {
+    let taskId = maxId
     taskId += 1
-    this.maxId = taskId
+    maxId = taskId
     const delta = (min * 60 + Number(sec)) * 1000
     return {
       createDate: new Date(),
@@ -295,45 +35,248 @@ class App extends Component {
     }
   }
 
-  render() {
-    const { todoData, newTodo, currentDate } = this.state
+  const data = [createTodoItem('fw', '12', '25'), createTodoItem('fw', '12', '25'), createTodoItem('fw', '12', '25')]
 
-    const todos = this.chusTodo(todoData, newTodo)
-
-    const todoComplited = todoData.filter((el) => el.complited).length
-    const activ = todoData.length - todoComplited
-    return (
-      <section className="todoapp">
-        <NewTaskForm todos={todoData} addItem={this.addItem} />
-
-        <section className="main">
-          <TaskList
-            currentDate={currentDate}
-            todos={todos}
-            onDelete={this.onDelete}
-            onToggleComplited={this.onToggleComplited}
-            edition={this.edition}
-            editItem={this.editItem}
-            onChecked={this.onChecked}
-            onStop={this.onStop}
-            onPlay={this.onPlay}
-          />
-
-          <Footer
-            todoComplited={todoComplited}
-            activ={activ}
-            filter={this.filter}
-            allchosen={this.allchosen}
-            todos={todoData}
-            complit={this.complit}
-            activchosen={this.activchosen}
-            deletComplited={this.deletComplited}
-            onAllDell={this.onAllDell}
-          />
-        </section>
-      </section>
-    )
+  const [todoData, setTodoData] = useState(data)
+  const [newTodo, setNewTodo] = useState([])
+  const [currentDate, setCurrentDate] = useState(new Date())
+  function tick() {
+    setCurrentDate(new Date())
   }
+  useEffect(() => {
+    const timerID = setInterval(() => tick(), 1000)
+    return () => clearInterval(timerID)
+  }, [])
+
+  const onDelete = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const newArr = todoData.toSpliced(ind, 1)
+
+    setTodoData(newArr)
+  }
+
+  const onChecked = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+
+    newItem.cheked = !oldItem.cheked
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  const onToggleComplited = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+    newItem.complited = !oldItem.complited
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  const allchosen = () => {
+    const newItem = JSON.parse(JSON.stringify(todoData))
+
+    newItem.forEach((element) => {
+      element.filtered = 'all'
+    })
+
+    setTodoData(newItem)
+  }
+
+  const complit = () => {
+    const newItem = JSON.parse(JSON.stringify(todoData))
+
+    newItem.forEach((el) => {
+      el.filtered = 'complited'
+    })
+
+    setTodoData(newItem)
+  }
+
+  const edition = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+    newItem.edit = !oldItem.edit
+    newItem.label = ''
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  const activchosen = () => {
+    const newItem = JSON.parse(JSON.stringify(todoData))
+
+    newItem.forEach((element) => {
+      element.filtered = 'activ'
+    })
+
+    setTodoData(newItem)
+  }
+
+  const deletComplited = () => {
+    const newTod = JSON.parse(JSON.stringify(todoData))
+
+    const newArr = newTod.filter((el) => !el.complited)
+
+    setTodoData(newArr)
+  }
+
+  const filter = () => {
+    const newTod = JSON.parse(JSON.stringify(todoData))
+    let newArr
+    newTod.forEach((element) => {
+      if (element.filtered === 'all') {
+        newArr = todoData
+
+        return newArr
+      }
+      if (element.filtered === 'complited') {
+        newArr = newTod.filter((el) => el.complited)
+
+        return newArr
+      }
+      if (element.filtered === 'activ') {
+        newArr = newTod.filter((el) => !el.complited)
+        return newArr
+      }
+      return newArr
+    })
+
+    setNewTodo(newArr)
+  }
+
+  const chusTodo = (a, b) => {
+    if (a[0].filtered === 'all') {
+      return a
+    }
+    return b
+  }
+
+  const editItem = (id, text) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+    newItem.label = text
+    newItem.edit = false
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  const addItem = (text, min, sec) => {
+    const newItem = createTodoItem(text, min, sec)
+
+    const newArr = [...todoData, newItem]
+
+    setTodoData(newArr)
+  }
+
+  const onPlay = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+
+    if (newItem.timeOnStop !== 0 && !newItem.onPlay) {
+      newItem.totalTime += newItem.timeOnStop - newItem.timeOnPlay
+    }
+    newItem.timeOnPlay = !newItem.onPlay ? new Date().valueOf() : newItem.timeOnPlay
+
+    newItem.onPlay = true
+    newItem.onStop = false
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  const onStop = (id) => {
+    const ind = todoData.findIndex((el) => el.id === id)
+    const oldItem = todoData[ind]
+    const newItem = JSON.parse(JSON.stringify(oldItem))
+
+    newItem.timeOnStop = !newItem.onStop ? new Date().valueOf() : newItem.timeOnStop
+
+    newItem.onStop = true
+    newItem.onPlay = false
+
+    const newArray = todoData.toSpliced(ind, 1, newItem)
+
+    setTodoData(newArray)
+  }
+
+  function calculateTime() {
+    const newTod = JSON.parse(JSON.stringify(todoData))
+
+    const newArray = newTod.map((index) => {
+      const item = { ...index }
+
+      let diff
+
+      if (item.onPlay) {
+        diff = item.timeOnPlay + item.delta - currentDate - item.totalTime
+      }
+      if (item.onStop) {
+        diff = item.timeOnPlay + item.delta - item.timeOnStop - item.totalTime
+      }
+      diff = diff > 0 ? diff : 0
+      const minuta = Math.floor(diff / 1000 / 60) % 60
+      const secunda = Math.floor(diff / 1000) % 60
+
+      item.newMinut = minuta < 10 ? `0${minuta}` : minuta
+      item.newSec = secunda < 10 ? `0${secunda}` : secunda
+
+      return item
+    })
+
+    setTodoData(newArray)
+  }
+
+  useEffect(() => {
+    calculateTime()
+  })
+
+  const todos = chusTodo(todoData, newTodo)
+
+  const todoComplited = todoData.filter((el) => el.complited).length
+  const activ = todoData.length - todoComplited
+  return (
+    <section className="todoapp">
+      <NewTaskForm todos={todoData} addItem={addItem} />
+
+      <section className="main">
+        <TaskList
+          currentDate={currentDate}
+          todos={todos}
+          onDelete={onDelete}
+          onToggleComplited={onToggleComplited}
+          edition={edition}
+          editItem={editItem}
+          onChecked={onChecked}
+          onStop={onStop}
+          onPlay={onPlay}
+        />
+
+        <Footer
+          todoComplited={todoComplited}
+          activ={activ}
+          filter={filter}
+          allchosen={allchosen}
+          todos={todoData}
+          complit={complit}
+          activchosen={activchosen}
+          deletComplited={deletComplited}
+        />
+      </section>
+    </section>
+  )
 }
 const el = <App />
 
