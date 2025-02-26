@@ -37,7 +37,7 @@ function NewTaskForm(props) {
   return (
     <header className="header">
       <AppHeader />
-      <form className="new-todo-form">
+      <div className="new-todo-form">
         <input
           placeholder="What needs to be done?"
           className="new-todo"
@@ -62,7 +62,7 @@ function NewTaskForm(props) {
           value={initialSec}
           data-action="sec"
         />
-      </form>
+      </div>
     </header>
   )
 }
